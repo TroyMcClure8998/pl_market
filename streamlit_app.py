@@ -50,6 +50,35 @@ st.markdown("""
                 width: 100%;
             }
         }
+
+        /* Add this to align columns */
+        .column-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: bold;
+            min-width: 100px;
+            padding: 8px 0;
+        }
+        .data-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 0;
+            min-width: 100px;
+            overflow-x: auto;
+            word-wrap: break-word;
+        }
+        .market-cell {
+            display: flex;
+            align-items: center;
+            min-width: 250px;
+            max-width: 250px;
+            overflow-x: auto;
+            word-wrap: break-word;
+        }
+
     </style>
 """, unsafe_allow_html=True)
 
@@ -427,7 +456,7 @@ if not stock_info_df.empty:
 
             st.markdown(f"""
     <div style="display: flex; align-items: center; border-bottom: 1px solid #1b2b44; padding: 10px 0; word-wrap: break-word;">
-        <div style="flex: 3; display: flex; align-items: center;  min-width: 150px; max-width: 250px; overflow-x: auto;">
+        <div class="market-cell">
             <img src="{row['icon']}" width="40" height="40" style="border-radius: 4px; object-fit: cover; margin-right: 10px;" />
             <div style="word-wrap: break-word;">
                 <div style="font-weight: 700; font-size: 15px; color: #ffffff; word-wrap: break-word;">
@@ -439,26 +468,22 @@ if not stock_info_df.empty:
                 </div>
             </div>
         </div>
-        <div style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 120px; max-width: 150px; overflow-x: auto; text-align: center;">
+        <div class="data-cell">
             <div style="width: 10px; height: 24px; border-radius: 4px; background-color: {risk_color_scale(row['current'])};"></div>
             <span>{risk_range_html}</span>
         </div>
-        <div style="flex: 1; text-align: center; min-width: 100px; max-width: 120px; overflow-x: auto;">{row['end_date']}</div>
-        <div style="flex: 1; text-align: center; min-width: 100px; max-width: 100px; overflow-x: auto;">{row['avg']:.0f}¢</div>
-        <div style="flex: 1; text-align: center; min-width: 100px; max-width: 100px; overflow-x: auto;">{row['current']:.0f}¢</div>
-        <div style="flex: 1; text-align: center; min-width: 100px; max-width: 100px; overflow-x: auto;">${row['risk']:.2f}</div>
-        <div style="flex: 1; text-align: center; color: {('#00f27d' if row['liquidation_25%'] > 0 else '#f76d6d')}; min-width: 100px; max-width: 120px; overflow-x: auto;">
-            ${row['liquidation_25%']:.2f}</div>
-        <div style="flex: 1; text-align: center; color: {('#00f27d' if row['liquidation_50%'] > 0 else '#f76d6d')}; min-width: 100px; max-width: 120px; overflow-x: auto;">
-            ${row['liquidation_50%']:.2f}</div>
-        <div style="flex: 1; text-align: center; color: {('#00f27d' if row['liquidation_75%'] > 0 else '#f76d6d')}; min-width: 100px; max-width: 120px; overflow-x: auto;">
-            ${row['liquidation_75%']:.2f}</div>
-        <div style="flex: 1; text-align: center; color: {('#00f27d' if row['liquidation pnl'] > 0 else '#f76d6d')}; min-width: 100px; max-width: 120px; overflow-x: auto;">
-            ${row['liquidation pnl']:.2f}</div>
-        <div style="flex: 1; text-align: center; min-width: 100px; max-width: 120px; overflow-x: auto;">
+        <div class="data-cell">{row['end_date']}</div>
+        <div class="data-cell">{row['avg']:.0f}¢</div>
+        <div class="data-cell">{row['current']:.0f}¢</div>
+        <div class="data-cell">${row['risk']:.2f}</div>
+        <div class="data-cell" style="color: {('#00f27d' if row['liquidation_25%'] > 0 else '#f76d6d')}">${row['liquidation_25%']:.2f}</div>
+        <div class="data-cell" style="color: {('#00f27d' if row['liquidation_50%'] > 0 else '#f76d6d')}">${row['liquidation_50%']:.2f}</div>
+        <div class="data-cell" style="color: {('#00f27d' if row['liquidation_75%'] > 0 else '#f76d6d')}">${row['liquidation_75%']:.2f}</div>
+        <div class="data-cell" style="color: {('#00f27d' if row['liquidation pnl'] > 0 else '#f76d6d')}">${row['liquidation pnl']:.2f}</div>
+        <div class="data-cell">
             ${row['reward']:.2f}<div style="font-size: 12px; word-wrap: break-word;">{row['return_pct']:.2f}%</div>
         </div>
-        <div style="flex: 1; text-align: right; padding-right: 10px; min-width: 120px; max-width: 150px; overflow-x: auto; word-wrap: break-word;">
+        <div class="data-cell" style="text-align: right; padding-right: 10px;">
             ${row['value']:.2f}<div style="font-size: 12px; color: {pnl_color}; word-wrap: break-word;">{f'+${row["pnl"]:.2f}' if row['pnl'] > 0 else f'${row["pnl"]:.2f}'} ({row['pnl_percent']:.2f}%)
         </div>
     </div>
