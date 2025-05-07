@@ -20,7 +20,7 @@ if "ascending" not in st.session_state:
     st.session_state.ascending = True
 
 
-# Dark Theme Styling (remains the same)
+# Dark Theme Styling
 st.markdown("""
     <style>
         .block-container { padding-top: 1rem; }
@@ -36,7 +36,7 @@ st.markdown("""
         .stButton>button:hover { background-color: #00c0f2; color: black; }
         .stTabs [data-baseweb="tab"] { background-color: #1b2b44; color: white; border: none; }
         .stTabs [aria-selected="true"] { background-color: #00c0f2; color: black; }
-       
+
         div[data-testid="stHorizontalBlock"] > div {
             flex: 1 1 auto;
             min-width: 100px;
@@ -51,7 +51,7 @@ st.markdown("""
             }
         }
 
-        /* Add this to align columns */
+        /* Ensure perfect alignment */
         .column-header {
             display: flex;
             align-items: center;
@@ -60,6 +60,8 @@ st.markdown("""
             font-weight: bold;
             min-width: 100px;
             padding: 8px 0;
+            text-align: center; /* Add this */
+            box-sizing: border-box;  /* Add this */
         }
         .data-cell {
             display: flex;
@@ -69,6 +71,8 @@ st.markdown("""
             min-width: 100px;
             overflow-x: auto;
             word-wrap: break-word;
+            text-align: center; /* Add this */
+            box-sizing: border-box; /* Add this */
         }
         .market-cell {
             display: flex;
@@ -77,6 +81,7 @@ st.markdown("""
             max-width: 250px;
             overflow-x: auto;
             word-wrap: break-word;
+            box-sizing: border-box; /* Add this */
         }
 
     </style>
@@ -462,14 +467,13 @@ if not stock_info_df.empty:
                 <div style="font-weight: 700; font-size: 15px; color: #ffffff; word-wrap: break-word;">
                     <a href='{row['market_link']}' target='_blank' style='color: #ffffff; text-decoration: none; word-wrap: break-word;'>{row['market']}</a>
                 </div>
-                <div style="margin-top: 5px; font-size: 12px; color: #b0b8c4; display: flex; align-items: center; gap: 8px; word-wrap: break-word;">
-                    <span style="background: {outcome_bg}; color: {outcome_color}; padding: 2px 8px; border-radius: 6px; font-weight: bold; font-size: 11px; word-wrap: break-word;">{row['outcome']}</span>
-                    {row['shares']:.1f} shares
+                <div style="margin-top: 5px; font-size: 12px; color: {outcome_bg};  padding: 2px 8px; border-radius: 6px; font-weight: bold;display: inline-block; word-wrap: break-word;">{row['outcome']}</span>
+                    <span style="color:#b0b8c4; margin-left: 8px;">{row['shares']:.1f} shares</span>
                 </div>
             </div>
         </div>
         <div class="data-cell">
-            <div style="width: 10px; height: 24px; border-radius: 4px; background-color: {risk_color_scale(row['current'])};"></div>
+            <div style="width: 10px; height: 24px; border-radius: 4px; background-color: {risk_color_scale(row['current'])}; margin: 0 auto;"></div>
             <span>{risk_range_html}</span>
         </div>
         <div class="data-cell">{row['end_date']}</div>
