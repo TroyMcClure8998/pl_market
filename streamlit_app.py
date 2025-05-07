@@ -20,7 +20,7 @@ if "ascending" not in st.session_state:
     st.session_state.ascending = True
 
 
-# Dark Theme Styling
+# Dark Theme Styling (remains the same)
 st.markdown("""
     <style>
         .block-container { padding-top: 1rem; }
@@ -36,7 +36,7 @@ st.markdown("""
         .stButton>button:hover { background-color: #00c0f2; color: black; }
         .stTabs [data-baseweb="tab"] { background-color: #1b2b44; color: white; border: none; }
         .stTabs [aria-selected="true"] { background-color: #00c0f2; color: black; }
-
+       
         div[data-testid="stHorizontalBlock"] > div {
             flex: 1 1 auto;
             min-width: 100px;
@@ -50,49 +50,15 @@ st.markdown("""
                 width: 100%;
             }
         }
-
-        /* Ensure perfect alignment */
-        .column-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffffff;
-            font-weight: bold;
-            min-width: 100px;
-            padding: 8px 0;
-            text-align: center; /* Add this */
-            box-sizing: border-box;  /* Add this */
-        }
-        .data-cell {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 0;
-            min-width: 100px;
-            overflow-x: auto;
-            word-wrap: break-word;
-            text-align: center; /* Add this */
-            box-sizing: border-box; /* Add this */
-        }
-        .market-cell {
-            display: flex;
-            align-items: center;
-            min-width: 250px;
-            max-width: 250px;
-            overflow-x: auto;
-            word-wrap: break-word;
-            box-sizing: border-box; /* Add this */
-        }
-
     </style>
 """, unsafe_allow_html=True)
 
 st.title("📊 Polymarket Dashboard")
 
-default_wallet = ["0xa5f8d182b6086ac0713e557fc28497e591da1aff"]  # Made default a list
-polymarket_url = f"https://polymarket.com/profile/{default_wallet[0]}"  # adjusted to show the first wallet
+default_wallet =  ["0xa5f8d182b6086ac0713e557fc28497e591da1aff"] # Made default a list
+polymarket_url = f"https://polymarket.com/profile/{default_wallet[0]}" # adjusted to show the first wallet
 st.markdown(f"""<label for="wallet">Enter Polymarket Wallet(s) (comma-separated) <a href="{polymarket_url}" target="_blank" style="color: #00c0f2; text-decoration: none;">Address</a>:</label>""", unsafe_allow_html=True)
-wallet_input = st.text_input("", value=",".join(default_wallet), key="wallet_input")  # changed default value
+wallet_input = st.text_input("", value=",".join(default_wallet), key="wallet_input") # changed default value
 
 # Update session state with the list of wallet addresses
 if wallet_input:
@@ -126,7 +92,6 @@ def fetch_holdings(wallet_addresses: List[str]):
         return combined_df
     else:
         return pd.DataFrame()
-
 
 @st.cache_data(ttl=60, show_spinner="Fetching Order Books...")
 def fetch_order_books(asset_ids):
@@ -193,7 +158,6 @@ def fetch_order_books(asset_ids):
 
     return order_book_asset
 
-
 def get_partial_sell_price(position_size, order_book, percent=1.0):
     target_shares = position_size * percent
     remaining_shares = target_shares
@@ -210,7 +174,6 @@ def get_partial_sell_price(position_size, order_book, percent=1.0):
             break
 
     return final_sell_price, total_sell_value
-
 
 @st.cache_data(show_spinner="Calculating Liquidation Prices...")
 def add_partial_sell_prices(stock_info_df, order_books_dict, percent_list):
@@ -251,11 +214,10 @@ def add_partial_sell_prices(stock_info_df, order_books_dict, percent_list):
         stock_info_df['sell_price_100%'] = 0.0
     return stock_info_df
 
-
 def extract_date_from_title(title: str) -> str:
     """
     Extracts a date from the title string, looking for "before", "after", or "by".
-    Returns a string in আইএসও-MM-DD format if found, otherwise "".
+    Returns a string in YYYY-MM-DD format if found, otherwise "".
     """
     month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     date_patterns = [
@@ -278,27 +240,25 @@ def extract_date_from_title(title: str) -> str:
                     month = next(i for i, m in enumerate(month_names, 1) if m.lower() == month_str[:3].lower())
                 except StopIteration:
                     return ""  # Return empty string if month is invalid
-                year = 2025  # Hardcoded year, adjust if needed
+                year = 2025 # Hardcoded year, adjust if needed
                 return f"{year}-{month:02d}-{day:02d}"
 
     return ""  # Return empty string if no date found
 
-
 risk_mapping = {(97, 99): "Very Low Risk",
-                (91, 96): "Low Risk",
-                (87, 90): "Moderately Low Risk",
-                (79, 86): "Moderate Risk",
-                (71, 79): "Moderately High Risk",
-                (61, 70): "High Risk",
-                (50, 60): "Very High Risk",
-                (40, 49): "Extremely High Risk",
-                (20, 30): "Speculative Risk",
-                (0, 19): "Extreme Risk", }
+    (91, 96): "Low Risk",
+    (87, 90): "Moderately Low Risk",
+    (79, 86): "Moderate Risk",
+    (71, 79): "Moderately High Risk",
+    (61, 70): "High Risk",
+    (50, 60): "Very High Risk",
+    (40, 49): "Extremely High Risk",
+    (20, 30): "Speculative Risk",
+    (0, 19): "Extreme Risk",}
 
 # Create a DataFrame to display
 risk_df = pd.DataFrame([{"Risk Category": v, "Score Range": f"{k[0]}%-{k[1]}%"}
-                        for k, v in risk_mapping.items()])
-
+    for k, v in risk_mapping.items()])
 
 def get_risk_info_from_price(price):
     """
@@ -308,7 +268,7 @@ def get_risk_info_from_price(price):
         price (float): The price of a share (0.00 to 1.00).
     Returns:
         tuple: (risk_label, probability_range_str)
-            Returns ("Invalid Price", "N/A") for invalid prices.
+               Returns ("Invalid Price", "N/A") for invalid prices.
     """
     if not 0.00 <= price <= 1.00:
         return "Invalid Price", "N/A"
@@ -317,7 +277,6 @@ def get_risk_info_from_price(price):
         if lower_bound <= probability_percentage <= upper_bound:
             return label, f"{lower_bound}-{upper_bound}%"
     return "Invalid Probability", "N/A"  # Should not reach here if price is valid
-
 
 def risk_color_scale(risk_value):
     # You can adjust these colors to fit your theme or use a gradient
@@ -342,45 +301,40 @@ def risk_color_scale(risk_value):
     else:
         return "#a3004f"  # Extreme Risk – Deep Red
 
-
 # Fetch and process data based on the current wallet address in session state
-holdings_df = fetch_holdings(st.session_state.wallet_addresses)  # Pass the list
+holdings_df = fetch_holdings(st.session_state.wallet_addresses) # Pass the list
 dt_open = holdings_df[holdings_df['redeemable'] == False].reset_index(drop=True) if not holdings_df.empty else pd.DataFrame()
 asset_ids = dt_open['asset'].tolist() if not dt_open.empty else []
 order_book_asset = fetch_order_books(asset_ids)
 
 percent_list = [0.25, 0.50, 0.75, 1]
-stock_info_df = add_partial_sell_prices(dt_open.copy(), order_book_asset, percent_list).sort_values(by='title',
-                                                                                                ascending=True) if not dt_open.empty else pd.DataFrame()
+stock_info_df = add_partial_sell_prices(dt_open.copy(), order_book_asset, percent_list).sort_values(by='title', ascending=True) if not dt_open.empty else pd.DataFrame()
 # Apply the mapping to create the 'risk' and 'probability_range' columns
-stock_info_df[['risk_range', 'probability_range']] = stock_info_df['curPrice'].apply(
-    lambda x: pd.Series(get_risk_info_from_price(x)))
+stock_info_df[['risk_range', 'probability_range']] = stock_info_df['curPrice'].apply(lambda x: pd.Series(get_risk_info_from_price(x)))
 
 if not stock_info_df.empty:
     df = pd.DataFrame({"market": stock_info_df['title'],
-                       "outcome": stock_info_df['outcome'].str.capitalize(),
-                       "shares": stock_info_df['size'].round(1),
-                       "avg": (stock_info_df['avgPrice'] * 100).round(2),
-                       "reward": stock_info_df['reward'].round(2),
-                       "return_pct": stock_info_df['%_return'],
-                       "risk": stock_info_df['risk'],
-                       "current": (stock_info_df['curPrice'] * 100).round(2),
-                       "value": stock_info_df['currentValue'].round(2),
-                       "liquidation_25%": stock_info_df['market_pnl_25%'].round(2),
-                       "sell_25": stock_info_df['sell_price_25%'].round(2),
-                       "liquidation_50%": stock_info_df['market_pnl_50%'].round(2),
-                       "liquidation_75%": stock_info_df['market_pnl_75%'].round(2),
-                       "liquidation_100%": stock_info_df['market_pnl_100%'].round(2),
-                       "initial_value": stock_info_df['initialValue'].round(2),
-                       "pnl": (stock_info_df['currentValue'] - stock_info_df['initialValue']).round(2),
-                       "liquidation pnl": stock_info_df['market_pnl_100%'].round(2),
-                       "pnl_percent": stock_info_df['percentPnl'].round(2),
-                       "icon": stock_info_df['icon'],
-                       "market_link": stock_info_df['market_link'],
-                       "risk_range": stock_info_df['risk_range'],
-                       "end_date": stock_info_df.apply(
-                           lambda row: row['endDate'] if row['endDate'] else extract_date_from_title(row['title']), axis=1)})
-
+        "outcome": stock_info_df['outcome'].str.capitalize(),
+        "shares": stock_info_df['size'].round(1),
+        "avg": (stock_info_df['avgPrice'] * 100).round(2),
+        "reward": stock_info_df['reward'].round(2),
+        "return_pct": stock_info_df['%_return'],
+        "risk": stock_info_df['risk'],
+        "current": (stock_info_df['curPrice'] * 100).round(2),
+        "value": stock_info_df['currentValue'].round(2),
+        "liquidation_25%": stock_info_df['market_pnl_25%'].round(2),
+        "liquidation_50%": stock_info_df['market_pnl_50%'].round(2),
+        "liquidation_75%": stock_info_df['market_pnl_75%'].round(2),
+        "liquidation_100%": stock_info_df['market_pnl_100%'].round(2),
+        "initial_value": stock_info_df['initialValue'].round(2),
+        "pnl": (stock_info_df['currentValue'] - stock_info_df['initialValue']).round(2),
+        "liquidation pnl": stock_info_df['market_pnl_100%'].round(2),
+        "pnl_percent": stock_info_df['percentPnl'].round(2),
+        "icon": stock_info_df['icon'],
+        "market_link": stock_info_df['market_link'],
+        "risk_range": stock_info_df['risk_range'],
+        "end_date": stock_info_df.apply(lambda row: row['endDate'] if row['endDate'] else extract_date_from_title(row['title']), axis=1)})
+    
     # Total Metrics
     total_risk = df['risk'].sum().round(2)
     total_value = df['value'].sum().round(2)
@@ -394,9 +348,11 @@ if not stock_info_df.empty:
     pnl_color = "🟢" if total_pnl > 0 else "🔴"
     col_d.metric(f"{pnl_color} Total PnL", f"${total_pnl:,.2f}")
 
-    tabs = st.tabs(["📋 Dashboard", "📈 Analytics", '💸 PNL Range    '])
+    tabs = st.tabs(["📋 Dashboard", "📈 Analytics"])
     with st.expander("📊 View Risk Classification Table"):
         st.table(risk_df)
+
+    
 
     with tabs[0]:
         # Use st.columns with a list to define the column widths
@@ -405,8 +361,7 @@ if not stock_info_df.empty:
 
         def header_button(label, col_name):
             arrow = "↑" if st.session_state.sort_by == col_name and st.session_state.ascending else "↓"
-            if st.button(f"{label} {arrow}" if st.session_state.sort_by == col_name else label,
-                         key=f"sort_button_{col_name}"):
+            if st.button(f"{label} {arrow}" if st.session_state.sort_by == col_name else label, key=f"sort_button_{col_name}"):
                 if st.session_state.sort_by == col_name:
                     st.session_state.ascending = not st.session_state.ascending
                 else:
@@ -414,33 +369,22 @@ if not stock_info_df.empty:
                     st.session_state.ascending = True
 
         # Apply header_button to each column
-        with col_headers[0]:
-            header_button("MARKET", "market")
-        with col_headers[1]:
-            header_button("Risk Level", "risk_range")
-        with col_headers[2]:
-            header_button("Close Date", "end_date")
-        with col_headers[3]:
-            header_button("AVG", "avg")
-        with col_headers[4]:
-            header_button("CURRENT", "current")
-        with col_headers[5]:
-            header_button("RISK", "risk")
-        with col_headers[6]:
-            header_button("Liq 25%", "liquidation_25%")
-        with col_headers[7]:
-            header_button("Liq 50%", "liquidation_50%")
-        with col_headers[8]:
-            header_button("Liq 75%", "liquidation_75%")
-        with col_headers[9]:
-            header_button("Liq 100%", "liquidation pnl")
-        with col_headers[10]:
-            header_button("REWARD", "reward")
-        with col_headers[11]:
-            header_button("VALUE", "value")
+        with col_headers[0]: header_button("MARKET", "market")
+        with col_headers[1]: header_button("Risk Level", "risk_range")
+        with col_headers[2]: header_button("Close Date", "end_date")
+        with col_headers[3]: header_button("AVG", "avg")
+        with col_headers[4]: header_button("CURRENT", "current")
+        with col_headers[5]: header_button("RISK", "risk")
+        with col_headers[6]: header_button("Liq 25%", "liquidation_25%")
+        with col_headers[7]: header_button("Liq 50%", "liquidation_50%")
+        with col_headers[8]: header_button("Liq 75%", "liquidation_75%")
+        with col_headers[9]: header_button("Liq 100%", "liquidation pnl")
+        with col_headers[10]: header_button("REWARD", "reward")
+        with col_headers[11]: header_button("VALUE", "value")
+        
 
         df = df.sort_values(by=st.session_state.sort_by, ascending=st.session_state.ascending)
-
+    
         for _, row in df.iterrows():
             outcome_bg = "#f76d6d" if row['outcome'] == "No" else "#00c0f2"
             outcome_color = "#000"
@@ -454,44 +398,41 @@ if not stock_info_df.empty:
 
             # HTML span with tooltip on hover
             risk_range_html = f"""
-                <span title="{tooltip}" style="cursor: pointer; text-decoration: underline; color: #00c0f2;" onclick="alert('{tooltip}')">
-                    {row['risk_range']}
-                </span>
-                """
-
+            <span title="{tooltip}" style="cursor: pointer; text-decoration: underline; color: #00c0f2;" onclick="alert('{tooltip}')">
+                {row['risk_range']}
+            </span>
+            """
+    
             st.markdown(f"""
-    <div style="display: flex; align-items: center; border-bottom: 1px solid #1b2b44; padding: 10px 0; word-wrap: break-word;">
-        <div class="market-cell">
-            <img src="{row['icon']}" width="40" height="40" style="border-radius: 4px; object-fit: cover; margin-right: 10px;" />
-            <div style="word-wrap: break-word;">
-                <div style="font-weight: 700; font-size: 15px; color: #ffffff; word-wrap: break-word;">
-                    <a href='{row['market_link']}' target='_blank' style='color: #ffffff; text-decoration: none; word-wrap: break-word;'>{row['market']}</a>
+            <div style="display: flex; align-items: center; border-bottom: 1px solid #1b2b44; padding: 10px 0; word-wrap: break-word;">
+                <div style="flex: 3; display: flex; align-items: center;  min-width: 100px;">
+                    <img src="{row['icon']}" width="40" height="40" style="border-radius: 4px; object-fit: cover; margin-right: 10px;" />
+                    <div style="word-wrap: break-word;">
+                        <div style="font-weight: 700; font-size: 15px; color: #ffffff; word-wrap: break-word;">
+                            <a href='{row['market_link']}' target='_blank' style='color: #ffffff; text-decoration: none; word-wrap: break-word;'>{row['market']}</a>
+                        </div>
+                        <div style="margin-top: 5px; font-size: 12px; color: #b0b8c4; display: flex; align-items: center; gap: 8px; word-wrap: break-word;">
+                            <span style="background: {outcome_bg}; color: {outcome_color}; padding: 2px 8px; border-radius: 6px; font-weight: bold; font-size: 11px; word-wrap: break-word;">{row['outcome']}</span>
+                            {row['shares']:.1f} shares
+                        </div> 
+                    </div>
                 </div>
-                <div style="margin-top: 5px; font-size: 12px; color: {outcome_bg};  padding: 2px 8px; border-radius: 6px; font-weight: bold;display: inline-block; word-wrap: break-word;">{row['outcome']}</span>
-                    <span style="color:#b0b8c4; margin-left: 8px;">{row['shares']:.1f} shares</span>
+                <div style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 100px;">
+    <div style="width: 10px; height: 24px; border-radius: 4px; background-color: {risk_color_scale(row['avg'])};"></div>
+    <span>{risk_range_html}</span>
+</div>
+                <div style="flex: 1; text-align: center; min-width: 100px;">{row['end_date']}</div>
+                <div style="flex: 1; text-align: center; min-width: 100px;">{row['avg']:.0f}¢</div>
+                <div style="flex: 1; text-align: center; min-width: 100px;">{row['current']:.0f}¢</div>
+                <div style="flex: 1; text-align: center; min-width: 100px;">${row['risk']:.2f}</div>
+                <div style="flex: 1; text-align: center; color: {('#00f27d' if row['liquidation_25%'] > 0 else '#f76d6d')}; min-width: 100px;">${row['liquidation_25%']:.2f}</div>
+                <div style="flex: 1; text-align: center; color: {('#00f27d' if row['liquidation_50%'] > 0 else '#f76d6d')}; min-width: 100px;">${row['liquidation_50%']:.2f}</div>
+                <div style="flex: 1; text-align: center; color: {('#00f27d' if row['liquidation_75%'] > 0 else '#f76d6d')}; min-width: 100px;">${row['liquidation_75%']:.2f}</div>
+                <div style="flex: 1; text-align: center; color: {('#00f27d' if row['liquidation pnl'] > 0 else '#f76d6d')}; min-width: 100px;">${row['liquidation pnl']:.2f}</div>
+                <div style="flex: 1; text-align: center; min-width: 100px;">${row['reward']:.2f}<div style="font-size: 12px; word-wrap: break-word;">{row['return_pct']:.2f}%</div></div>
+                <div style="flex: 1; text-align: right; padding-right: 10px; min-width: 100px; word-wrap: break-word;">${row['value']:.2f}<div style="font-size: 12px; color: {pnl_color}; word-wrap: break-word;">{f'+${row["pnl"]:.2f}' if row['pnl'] > 0 else f'${row["pnl"]:.2f}'} ({row['pnl_percent']:.2f}%)</div></div>
                 </div>
-            </div>
-        </div>
-        <div class="data-cell">
-            <div style="width: 10px; height: 24px; border-radius: 4px; background-color: {risk_color_scale(row['current'])}; margin: 0 auto;"></div>
-            <span>{risk_range_html}</span>
-        </div>
-        <div class="data-cell">{row['end_date']}</div>
-        <div class="data-cell">{row['avg']:.0f}¢</div>
-        <div class="data-cell">{row['current']:.0f}¢</div>
-        <div class="data-cell">${row['risk']:.2f}</div>
-        <div class="data-cell" style="color: {('#00f27d' if row['liquidation_25%'] > 0 else '#f76d6d')}">${row['liquidation_25%']:.2f}</div>
-        <div class="data-cell" style="color: {('#00f27d' if row['liquidation_50%'] > 0 else '#f76d6d')}">${row['liquidation_50%']:.2f}</div>
-        <div class="data-cell" style="color: {('#00f27d' if row['liquidation_75%'] > 0 else '#f76d6d')}">${row['liquidation_75%']:.2f}</div>
-        <div class="data-cell" style="color: {('#00f27d' if row['liquidation pnl'] > 0 else '#f76d6d')}">${row['liquidation pnl']:.2f}</div>
-        <div class="data-cell">
-            ${row['reward']:.2f}<div style="font-size: 12px; word-wrap: break-word;">{row['return_pct']:.2f}%</div>
-        </div>
-        <div class="data-cell" style="text-align: right; padding-right: 10px;">
-            ${row['value']:.2f}<div style="font-size: 12px; color: {pnl_color}; word-wrap: break-word;">{f'+${row["pnl"]:.2f}' if row['pnl'] > 0 else f'${row["pnl"]:.2f}'} ({row['pnl_percent']:.2f}%)
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
 
     with tabs[1]:
         st.subheader("📊 Portfolio Analytics")
@@ -501,13 +442,13 @@ if not stock_info_df.empty:
         with col1:
             st.markdown("### PnL by Market")
             pnl_chart = px.bar(df.sort_values('pnl', ascending=False),
-                              x='market',
-                              y='pnl',
-                              color='pnl',
-                              color_continuous_scale='RdYlGn',
-                              title="PnL (Profit & Loss) by Market",
-                              labels={'pnl': 'PnL ($)', 'market': 'Market'},
-                              text_auto=".2s")
+                x='market',
+                y='pnl',
+                color='pnl',
+                color_continuous_scale='RdYlGn',
+                title="PnL (Profit & Loss) by Market",
+                labels={'pnl': 'PnL ($)', 'market': 'Market'},
+                text_auto=".2s")
             pnl_chart.update_layout(
                 xaxis_title="Market",
                 yaxis_title="PnL ($)",
@@ -536,21 +477,6 @@ if not stock_info_df.empty:
             st.plotly_chart(value_chart, use_container_width=True)
 
         st.markdown("### Detailed Market Table")
-        st.dataframe(df[["market", "outcome", "shares", 'end_date', "avg", "current", "risk", "liquidation_25%",
-                       "liquidation_50%", "liquidation_75%", "liquidation pnl", "reward", "return_pct", "value", "pnl"]],
-                     use_container_width=True,
-                     hide_index=True)
-    with tabs[2]:
-        dt = df.copy()
-        dt['end_date'] = pd.to_datetime(dt['end_date'], format='%Y-%m-%d')
-        dt['end_date'] = dt['end_date'].dt.strftime('%Y-%m-%d')
-        dt['liquidation pnl'] = dt['liquidation pnl'].round(2)
-        dt['End Date'] = pd.to_datetime(dt['end_date'])
-        dt = dt.sort_values('End Date')
-        # dt = dt.groupby('end_date')['liquidation pnl'].sum().reset_index()
-        dt = dt.groupby(['End Date', 'risk_range']).agg({'liquidation pnl': 'sum'}).reset_index()
-
-        st.dataframe(dt,
-                     use_container_width=True,
-                     hide_index=False)
-
+        st.dataframe(df[["market", "outcome", "shares", 'end_date', "avg", "current", "risk", "liquidation_25%", "liquidation_50%", "liquidation_75%", "liquidation pnl", "reward", "return_pct", "value", "pnl"]],
+            use_container_width=True,
+            hide_index=True)
