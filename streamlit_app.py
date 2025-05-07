@@ -221,7 +221,7 @@ def add_partial_sell_prices(stock_info_df, order_books_dict, percent_list):
 def extract_date_from_title(title: str) -> str:
     """
     Extracts a date from the title string, looking for "before", "after", or "by".
-    Returns a string in YYYY-MM-DD format if found, otherwise "".
+    Returns a string in আইএসও-MM-DD format if found, otherwise "".
     """
     month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     date_patterns = [
@@ -427,7 +427,7 @@ if not stock_info_df.empty:
 
             st.markdown(f"""
     <div style="display: flex; align-items: center; border-bottom: 1px solid #1b2b44; padding: 10px 0; word-wrap: break-word;">
-        <div style="flex: 3; display: flex; align-items: center;  min-width: 100px; max-width: 250px; overflow-x: auto;">
+        <div style="flex: 3; display: flex; align-items: center;  min-width: 150px; max-width: 250px; overflow-x: auto;">
             <img src="{row['icon']}" width="40" height="40" style="border-radius: 4px; object-fit: cover; margin-right: 10px;" />
             <div style="word-wrap: break-word;">
                 <div style="font-weight: 700; font-size: 15px; color: #ffffff; word-wrap: break-word;">
@@ -439,7 +439,7 @@ if not stock_info_df.empty:
                 </div>
             </div>
         </div>
-        <div style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 100px; max-width: 150px; overflow-x: auto;">
+        <div style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 120px; max-width: 150px; overflow-x: auto; text-align: center;">
             <div style="width: 10px; height: 24px; border-radius: 4px; background-color: {risk_color_scale(row['current'])};"></div>
             <span>{risk_range_html}</span>
         </div>
@@ -458,7 +458,7 @@ if not stock_info_df.empty:
         <div style="flex: 1; text-align: center; min-width: 100px; max-width: 120px; overflow-x: auto;">
             ${row['reward']:.2f}<div style="font-size: 12px; word-wrap: break-word;">{row['return_pct']:.2f}%</div>
         </div>
-        <div style="flex: 1; text-align: right; padding-right: 10px; min-width: 100px; max-width: 150px; overflow-x: auto; word-wrap: break-word;">
+        <div style="flex: 1; text-align: right; padding-right: 10px; min-width: 120px; max-width: 150px; overflow-x: auto; word-wrap: break-word;">
             ${row['value']:.2f}<div style="font-size: 12px; color: {pnl_color}; word-wrap: break-word;">{f'+${row["pnl"]:.2f}' if row['pnl'] > 0 else f'${row["pnl"]:.2f}'} ({row['pnl_percent']:.2f}%)
         </div>
     </div>
@@ -524,3 +524,4 @@ if not stock_info_df.empty:
         st.dataframe(dt,
                      use_container_width=True,
                      hide_index=False)
+
